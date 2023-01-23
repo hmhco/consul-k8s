@@ -17,6 +17,7 @@ first checkout hashicorp target tag
 #               our branch   hashicorps tag
 git checkout -b v0.X.X-hmhco v0.x.x 
 
-add the changes in this commit 
-https://github.com/Pveasey/consul-k8s/commit/3fb8965c5848abc9c1f39a23fc7a12134290ccb7
+add the go changes and dockerfile like this PR
+https://github.com/hmhco/consul-k8s/pull/1/
 
+You will need to update the `FROM hashicorp/consul-k8s-control-plane:0.43.0` to match the target version of the build
