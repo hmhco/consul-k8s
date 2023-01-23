@@ -132,9 +132,12 @@ func (h *Handler) envoySidecarLifecycle(pod corev1.Pod) (*corev1.Lifecycle, erro
 
 	delay, annotationSet := pod.Annotations[annotationSidecarProxyPreStopDelay]
 
-    //default 1 second delay with no annotation set for annotationSidecarProxyPreStopDelay
+    //default delay with no annotationSidecarProxyPreStopDelay set
+    // With testing in sandbox with consul 1.12.8 - 1 second appears to be too slow in some cases
+    // never seen it fail requests with 2 second delay but will
+    // default 3 seconds to have ample time to de-register consul service
 	if !annotationSet {
-		delay := 1
+		delay = "3"
 	}
 
 	lifecycle := &corev1.Lifecycle{
