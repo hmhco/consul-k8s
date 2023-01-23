@@ -86,6 +86,9 @@ const (
 	annotationConsulSidecarMemoryLimit   = "consul.hashicorp.com/consul-sidecar-memory-limit"
 	annotationConsulSidecarMemoryRequest = "consul.hashicorp.com/consul-sidecar-memory-request"
 
+	// annotationSidecarProxyPreStopDelay is the number of seconds to delay Envoy Sidecar shutdown
+	annotationSidecarProxyPreStopDelay = "consul.hashicorp.com/sidecar-proxy-prestop-delay"
+
 	// annotations for metrics to configure where Prometheus scrapes
 	// metrics from, whether to run a merged metrics endpoint on the consul
 	// sidecar, and configure the connect service metrics.
