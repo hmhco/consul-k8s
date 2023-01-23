@@ -132,8 +132,9 @@ func (h *Handler) envoySidecarLifecycle(pod corev1.Pod) (*corev1.Lifecycle, erro
 
 	delay, annotationSet := pod.Annotations[annotationSidecarProxyPreStopDelay]
 
+    //default 1 second delay with no annotation set for annotationSidecarProxyPreStopDelay
 	if !annotationSet {
-		return &corev1.Lifecycle{}, fmt.Errorf("Annotation not set")
+		delay := 1
 	}
 
 	lifecycle := &corev1.Lifecycle{
