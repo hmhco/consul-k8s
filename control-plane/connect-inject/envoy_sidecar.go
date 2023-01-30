@@ -48,6 +48,11 @@ func (h *Handler) envoySidecar(namespace corev1.Namespace, pod corev1.Pod, mpi m
 		Command: cmd,
 	}
 
+	lifecycle, err := h.envoySidecarLifecycle(pod)
+	if err == nil {
+		container.Lifecycle = lifecycle
+	}
+
 	tproxyEnabled, err := transparentProxyEnabled(namespace, pod, h.EnableTransparentProxy)
 	if err != nil {
 		return corev1.Container{}, err
@@ -122,6 +127,34 @@ func (h *Handler) getContainerSidecarCommand(pod corev1.Pod, multiPortSvcName st
 	}
 	return cmd, nil
 }
+
+func (h *Handler) envoySidecarLifecycle(pod corev1.Pod) (*corev1.Lifecycle, error) {
+
+	delay, annotationSet := pod.Annotations[annotationSidecarProxyPreStopDelay]
+
+	//default delay with no annotationSidecarProxyPreStopDelay set
+	// With testing in sandbox with consul 1.12.8 - 1 second appears to be too slow in some cases
+	// never seen it fail requests with 2 second delay but will
+	// default 3 seconds to have ample time to de-register consul service
+	if !annotationSet {
+		delay = "3"
+	}
+
+	lifecycle := &corev1.Lifecycle{
+		PreStop: &corev1.Handler{
+			Exec: &corev1.ExecAction{
+				Command: []string{
+					"/bin/sh",
+					"-c",
+					"sleep " + delay,
+				},
+			},
+		},
+	}
+
+	return lifecycle, nil
+}
+
 
 func (h *Handler) envoySidecarResources(pod corev1.Pod) (corev1.ResourceRequirements, error) {
 	resources := corev1.ResourceRequirements{
