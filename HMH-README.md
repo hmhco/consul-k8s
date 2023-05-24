@@ -1,6 +1,6 @@
 ### Building
 
-#### 1.12.x
+#### 1.13.x
 ```
 git clone https://github.com/hmhco/consul-k8s
 cd consul-k8s/
