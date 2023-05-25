@@ -95,6 +95,10 @@ const (
 	annotationConsulSidecarMemoryLimit   = "consul.hashicorp.com/consul-sidecar-memory-limit"
 	annotationConsulSidecarMemoryRequest = "consul.hashicorp.com/consul-sidecar-memory-request"
 
+	// annotationSidecarProxyPreStopDelay is the number of seconds to delay Envoy Sidecar shutdown
+	// set to 0 to have no delay, defaults to 3 seconds
+	annotationSidecarProxyPreStopDelay = "consul.hashicorp.com/sidecar-proxy-prestop-delay"
+
 	// annotations for sidecar volumes.
 	annotationConsulSidecarUserVolume      = "consul.hashicorp.com/consul-sidecar-user-volume"
 	annotationConsulSidecarUserVolumeMount = "consul.hashicorp.com/consul-sidecar-user-volume-mount"

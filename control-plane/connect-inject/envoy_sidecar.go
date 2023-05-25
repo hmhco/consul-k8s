@@ -68,6 +68,12 @@ func (w *MeshWebhook) envoySidecar(namespace corev1.Namespace, pod corev1.Pod, m
 		container.VolumeMounts = append(container.VolumeMounts, volumeMount...)
 	}
 
+	// configures lifecycling for graceful shutdown - see https://github.com/hashicorp/consul-k8s/issues/536
+	lifecycle, err := w.envoySidecarGracefulShutdown(pod)
+	if err == nil && lifecycle != nil {
+		container.Lifecycle = lifecycle
+	}
+
 	tproxyEnabled, err := transparentProxyEnabled(namespace, pod, w.EnableTransparentProxy)
 	if err != nil {
 		return corev1.Container{}, err
@@ -156,6 +162,33 @@ func (w *MeshWebhook) getContainerSidecarCommand(pod corev1.Pod, multiPortSvcNam
 		}
 	}
 	return cmd, nil
+}
+
+func (w *MeshWebhook) envoySidecarGracefulShutdown(pod corev1.Pod) (*corev1.Lifecycle, error) {
+
+	delay, annotationSet := pod.Annotations[annotationSidecarProxyPreStopDelay]
+
+	//default delay with no annotationSidecarProxyPreStopDelay set
+	// With testing in sandbox with consul 1.13.8 - 1 second appears to be too slow in some cases
+	// never seen it fail requests with 2 second delay but will
+	// default 3 seconds to have ample time to de-register consul service
+	if !annotationSet {
+		delay = "3"
+	}
+
+	lifecycle := &corev1.Lifecycle{
+		PreStop: &corev1.Handler{
+			Exec: &corev1.ExecAction{
+				Command: []string{
+					"/bin/sh",
+					"-c",
+					"sleep " + delay,
+				},
+			},
+		},
+	}
+
+	return lifecycle, nil
 }
 
 func (w *MeshWebhook) envoySidecarResources(pod corev1.Pod) (corev1.ResourceRequirements, error) {
